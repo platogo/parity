@@ -50,11 +50,11 @@ describe Parity::Environment do
   end
 
   def heroku_backup
-    "heroku pgbackups:capture --expire --remote production"
+    "hk pgbackups:capture --expire -a production"
   end
 
   def heroku_console
-    "heroku run rails console --remote production"
+    "hk run rails console -a production"
   end
 
   def heroku_log2viz
@@ -63,16 +63,16 @@ describe Parity::Environment do
 
   def migrate
      %{
-        heroku run rake db:migrate --remote production &&
-        heroku restart --remote production
+        hk run rake db:migrate -a production &&
+        hk restart -a production
       }
   end
 
   def tail
-    "heroku logs --tail --remote production"
+    "hk logs --tail -a production"
   end
 
   def open
-    "heroku open --remote production"
+    "hk open -a production"
   end
 end

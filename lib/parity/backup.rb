@@ -31,7 +31,7 @@ module Parity
     end
 
     def restore_to_pass_through
-      Kernel.system "heroku pgbackups:restore #{backup_from} --remote #{to}"
+      Kernel.system "hk pgbackups:restore #{backup_from} -a #{to}"
     end
 
     def backup_from
@@ -39,7 +39,7 @@ module Parity
     end
 
     def db_backup_url
-      "heroku pgbackups:url --remote #{from}"
+      "hk pgbackups:url -a #{from}"
     end
 
     def development_db

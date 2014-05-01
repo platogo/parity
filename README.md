@@ -17,13 +17,17 @@ This installs three shell commands:
 Your development machine will also need these command-line programs:
 
     curl
-    heroku
+    hk
     pg_restore
 
-On a Mac, `curl` is installed by default and the other programs can be installed
-with Homebrew:
+On a Mac, `curl` is installed by default.
 
-    brew install heroku-toolbelt
+Install `hk`:
+
+    L=/usr/local/bin/hk && curl -sL -A "`uname -sp`" https://hk.heroku.com/hk.gz | zcat >$L && chmod +x $L
+
+Install `pg_restore`:
+
     brew install postgres --no-python
 
 Usage
@@ -64,7 +68,8 @@ Tail a log:
     staging tail
 
 The scripts also pass through, so you can do anything with them that you can do
-with `heroku ______ --remote staging` or `heroku ______ --remote production`:
+with `hk ______ -a staging` or `hk ______ -a production` where `staging` and
+`production` are git remotes:
 
     watch production ps
     staging open
