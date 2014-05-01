@@ -45,10 +45,6 @@ module Parity
       }
     end
 
-    def tail
-      Kernel.system "hk logs --tail -a #{environment}"
-    end
-
     def heroku_app_name
       [basename, environment].join('-')
     end

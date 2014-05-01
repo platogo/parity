@@ -33,14 +33,6 @@ describe Parity::Environment do
     expect(Kernel).to have_received(:system).with(migrate)
   end
 
-  it 'tails logs' do
-    Kernel.stub(:system)
-
-    Parity::Environment.new('production', ['tail']).run
-
-    expect(Kernel).to have_received(:system).with(tail)
-  end
-
   it 'opens the app' do
     Kernel.stub(:system)
 
@@ -66,10 +58,6 @@ describe Parity::Environment do
         hk run rake db:migrate -a production &&
         hk restart -a production
       }
-  end
-
-  def tail
-    "hk logs --tail -a production"
   end
 
   def open

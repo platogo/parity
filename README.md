@@ -62,11 +62,6 @@ Migrate a database and restart the dynos:
     production migrate
     staging migrate
 
-Tail a log:
-
-    production tail
-    staging tail
-
 The scripts also pass through, so you can do anything with them that you can do
 with `hk ______ -a staging` or `hk ______ -a production` where `staging` and
 `production` are git remotes:
