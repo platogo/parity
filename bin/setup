@@ -1,13 +1,9 @@
 #!/usr/bin/env sh
 
-# Run this script immediately after cloning the codebase.
-
-# Exit if any subcommand fails
 set -e
 
-# Set up Ruby dependencies via Bundler
-bundle install
+# Fetch build and test dependencies
+go get -d -t -v ./...
 
-# Add binstubs to PATH in ~/.zshenv like this:
-#   export PATH=".git/safe/../../bin:$PATH"
-mkdir -p .git/safe
+# Install "gox" for cross-compiled releases
+go get github.com/mitchellh/gox

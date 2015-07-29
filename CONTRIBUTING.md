@@ -10,11 +10,17 @@ Set up your machine:
 
 Make sure the tests pass:
 
-    rake
+    go test
 
-Make your change. Add tests for your change. Make the tests pass:
+Make your change. Add tests for your change. Make the tests pass.
 
-    rake
+Build:
+
+    go build
+
+Install locally:
+
+    go install
 
 Push to your fork and [submit a pull request][pr].
 
@@ -28,3 +34,21 @@ Wait for feedback. Increase the chance that your pull request is accepted:
 
 [style]: https://github.com/thoughtbot/guides/tree/master/style
 [commit]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
+
+CI
+--
+
+In addition to passing the tests, commits must also pass `go fmt` and `go vet`.
+
+To catch any formatting or vet problems before CI, `bin/vet` can be used as a
+`pre-commit` hook:
+
+```shell
+ln -nsi ../../bin/vet .git/hooks/pre-commit
+```
+
+Or added to your existing, local `pre-commit` hooks:
+
+```
+[[ -x bin/vet ]] && { bin/vet || exit $?; }
+```

@@ -1,9 +1,16 @@
-language:
-  - ruby
-
-rvm:
-  - 2.1.5
-
-branches:
-  only:
-    - master
+sudo: false
+language: go
+install: bin/setup
+script: bin/vet && go test -v ./...
+before_deploy: bin/prepare-release
+deploy:
+  provider: releases
+  api-key: "" # run bin/once to generate api key
+  file_glob: true
+  file:
+  - _releases/*.tar.gz
+  - _releases/*.zip
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true

@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# validates that the project is clean of formatting and vet errors. symlink as
+# .git/hooks/pre-commit to use as a pre-commit check.
+#
+
+if [[ -n "${GIT_INDEX_FILE}" ]]; then
+  gofiles=$(git diff --cached --name-only --diff-filter=ACM | grep '.go$')
+else
+  gofiles=$(go list -f '{{$dir := .Dir}}{{range .GoFiles}}{{$dir}}/{{.}} {{end}}' ./...)
+fi
+
+[ -z "$gofiles" ] && exit 0
+
+function checkfmt() {
+  unformatted=$(gofmt -l $*)
+  [ -z "$unformatted" ] && return 0
+
+  echo >&2 "Go files must be formatted with gofmt. Please run:"
+  for fn in $unformatted; do
+    echo >&2 "  gofmt -w $PWD/$fn"
+  done
+
+  return 1
+}
+
+function checkvet() {
+  # build grep regex filter from gofiles
+  for f in $*; do
+    [ -z "$filter" ] && filter=$f || filter="$filter\|$f"
+  done
+
+  # go vet does not support checking individual files across packages; so
+  # instead we vet all files, and ignore errors for files not included in this
+  # change-set.
+  unvetted=$(go vet ./... 2>&1 | grep "^\($filter\)")
+  [ -z "$unvetted" ] && return 0
+
+  echo >&2 "Go files must be vetted. Check these problems:"
+  IFS=$'\n'
+  for line in $unvetted; do
+    echo >&2 "  $line"
+  done
+  unset IFS
+
+  return 1
+}
+
+checkfmt $gofiles || fail=yes
+checkvet $gofiles || fail=yes
+
+[ -z "$fail" ] || exit 1

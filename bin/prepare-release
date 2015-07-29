@@ -1,0 +1,58 @@
+#!/bin/bash -e
+#
+# prepare-release builds the command for each target os and architecture,
+# generating release archives in _releases/.
+
+# NAME: base name for generated archives.
+NAME=${NAME:=$(basename $PWD)}
+
+# BUILD_ARCH: space separated list of architectures to build for.
+BUILD_ARCH=${BUILD_ARCH:="amd64"}
+
+# BUILD_OS: space separated list of operating systems to build for.
+BUILD_OS=${BUILD_OS:="linux windows darwin"}
+
+# VERSION: archive names and Version
+VERSION=${VERSION:=$(git describe --tags)}
+
+commit_id=$(git rev-parse --short HEAD)
+ldflags="-X main.Version $VERSION -X main.CommitID ${commit_id}"
+goroot=${GOROOT:=$(go env GOROOT)}
+
+# ensure cross-compile toolchain is set up for each os / architecture
+for arch in $BUILD_ARCH; do
+  for os in $BUILD_OS; do
+    if [[ ! -d "${goroot}/pkg/${os}_${arch}" ]]; then
+      gox -parallel 1 \
+          -arch "${arch}" \
+          -os "${arch}" \
+          -build-toolchain
+    fi
+  done
+done
+
+# clean up from previous builds
+[[ -d _releases/build ]] && rm -r _releases/build
+
+# build for each os and architecture
+gox -arch    "${BUILD_ARCH}" \
+    -os      "${BUILD_OS}" \
+    -ldflags "${ldflags}" \
+    -output  "_releases/build/{{.OS}}_{{.Arch}}/{{.Dir}}" \
+    ./...
+
+# generate archives for each os and architecture
+for arch in $BUILD_ARCH; do
+  for os in $BUILD_OS; do
+    build="_releases/build/${os}_${arch}"
+    archive="_releases/${NAME}_${VERSION}_${os}_${arch}.tar.gz"
+
+    if [[ "${os}" == "windows" ]]; then
+      archive="${archive%.tar.gz}.zip"
+
+      zip -j "${archive}" "${build}"/* >/dev/null
+    else
+      tar -C "${build}" -czf "${archive}" .
+    fi
+  done
+done
